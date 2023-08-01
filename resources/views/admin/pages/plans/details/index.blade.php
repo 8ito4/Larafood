@@ -16,6 +16,8 @@
 @section('content')
     <div class="card">
         <div class="card-body">
+            @include('admin.includes.alerts')    
+
             <table class="table table-condensed">
                 <thead>
                     <tr>
@@ -33,7 +35,7 @@
                                 {{-- BOTAO EDITAR    --}}
                                 <a href="{{ route('details.plan.edit', [$plan->url, $detail->id]) }}" class="btn btn-dark"><i class="fas fa-edit"></i></a>   
                                 {{-- BOTAO VIZUALIZAR    --}}
-                                <a href="{{ route('plans.show', $plan->url) }}" class="btn btn-warning"><i class="fas fa-eye"></i></a> 
+                                <a href="{{ route('details.plan.show', [$plan->url, $detail->id]) }}" class="btn btn-warning"><i class="fas fa-eye"></i></a> 
                             </td>
                         </tr>                       
                     @endforeach
