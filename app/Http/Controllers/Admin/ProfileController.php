@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\StoreUpdateProfile;
 use App\Http\Controllers\Controller;
 use App\Models\Profile;
+use Illuminate\Cache\Repository;
 use Illuminate\Http\Request;
 
 class ProfileController extends Controller
@@ -44,7 +46,7 @@ class ProfileController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StoreUpdateProfile $request)
     {
         $this->repository->create($request->all());
 
@@ -59,7 +61,12 @@ class ProfileController extends Controller
      */
     public function show($id)
     {
-        //
+        if (!$profile = $this->repository->find($id)) {
+            return redirect()->back();
+        }
+
+        return view('admin.pages.profiles.show', compact('profile'));
+
     }
 
     /**
@@ -70,19 +77,30 @@ class ProfileController extends Controller
      */
     public function edit($id)
     {
-        //
+        if (!$profile = $this->repository->find($id)) {
+            return redirect()->back();
+        }
+
+        return view('admin.pages.profiles.edit', compact('profile'));
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Http\Requests\StoreUpdateProfile  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(StoreUpdateProfile $request, $id)
     {
-        //
+        if (!$profile = $this->repository->find($id)) {
+            return redirect()->back();
+        }    
+
+        $profile->update($request->all());
+
+        return redirect()->route('profiles.index');
+
     }
 
     /**
@@ -93,6 +111,37 @@ class ProfileController extends Controller
      */
     public function destroy($id)
     {
-        //
+        if (!$profile = $this->repository->find($id)) {
+            return redirect()->back();
+        }    
+
+        $profile->delete();
+
+        return redirect()->route('profiles.index');
+   
+    }
+
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function search(Request $request)
+    {
+        $filters = $request->only('filter');
+
+        $profiles = $this->repository
+                         ->where(function($query) use ($request) {
+                            if ($request->filter) {
+                                $query->where('name', $request->filter)
+                                      ->orwhere('description', 'LIKE', "%{$request->filter}%");
+                            }
+
+                         })
+                         ->paginate();
+
+        return view('admin.pages.profiles.index', compact('profiles', 'filters'));
     }
 }
