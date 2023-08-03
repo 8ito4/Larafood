@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\DetailPlanController;
+use App\Http\Controllers\Admin\PermissionController;
 use App\Http\Controllers\Admin\PlanController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\ProfileController;
@@ -9,6 +10,12 @@ use App\Http\Controllers\Admin\ProfileController;
 
 Route::prefix('admin')
         ->group(function() {
+
+    // Routes Details Permission        
+
+    Route::any('permissions/search', [PermissionController::class, 'search'])->name('permissions.search');
+    Route::resource('permissions', PermissionController::class);        
+
 
     // Routes   Profile
     Route::any('profiles/search', [ProfileController::class, 'search'])->name('profiles.search');
